@@ -33,11 +33,13 @@ jobs:
       - name: Build EXE
         if: success()  # 如果测试成功，则执行构建
         run: |
-          cd src; pyinstaller -F -w net_speed_monitor.py
+          cd src
+          pyinstaller -F -w net_speed_monitor.py
+          dir dist
 
       - name: Upload EXE artifact
         if: success()  # 如果构建成功，则上传EXE文件
         uses: actions/upload-artifact@v4
         with:
-          name: built-exe
+          name: net_speed_monitor.exe
           path: src/dist/net_speed_monitor.exe
