@@ -30,6 +30,8 @@ class NetworkMonitorApp:
         self.always_on_top = True
         self.root.attributes('-topmost', self.always_on_top)
 
+        self.running = True  # 控制线程的运行
+
         self.create_context_menu()
         self.start_network_monitor()
 
@@ -59,7 +61,7 @@ class NetworkMonitorApp:
 
         tk.Label(win, text="Adjust Transparency:").pack(pady=5)
         scale = tk.Scale(win, from_=0.1, to=1.0, orient='horizontal', resolution=0.01, command=on_scale)
-        scale.set(0.8)
+        scale.set(self.root.attributes('-alpha'))
         scale.pack(pady=5)
 
     def start_drag(self, event):
@@ -96,6 +98,7 @@ class NetworkMonitorApp:
 
     def exit_app(self):
         """退出应用"""
+        self.running = False  # 停止线程
         self.root.quit()
 
     def format_speed(self, speed):
@@ -110,7 +113,7 @@ class NetworkMonitorApp:
     def update_network_speed(self):
         """更新网络速度"""
         old_io_counters = psutil.net_io_counters()
-        while True:
+        while self.running:
             time.sleep(1)
             new_io_counters = psutil.net_io_counters()
             download_speed = new_io_counters.bytes_recv - old_io_counters.bytes_recv
@@ -120,7 +123,7 @@ class NetworkMonitorApp:
 
     def update_cpu_memory_usage(self):
         """更新CPU和内存使用情况"""
-        while True:
+        while self.running:
             time.sleep(1)
             if self.show_cpu_mem:
                 cpu_usage = psutil.cpu_percent()
